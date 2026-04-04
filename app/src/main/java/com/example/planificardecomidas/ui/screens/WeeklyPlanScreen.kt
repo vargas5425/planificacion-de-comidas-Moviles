@@ -2,64 +2,88 @@ package com.example.planificardecomidas.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.planificardecomidas.ViewModels.RecipeViewModel
 
 @Composable
 fun WeeklyPlanScreen(viewModel: RecipeViewModel) {
 
-    Column(modifier = Modifier.padding(16.dp)) {
-
-        Text("Asignar Comidas", textAlign = TextAlign.Center,
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            "Plan Semanal",
+            fontSize = 20.sp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp))
+                .padding(bottom = 12.dp)
+        )
 
         viewModel.planSemanal.forEach { (dia, receta) ->
 
             var expanded by remember { mutableStateOf(false) }
 
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(5.dp)) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = dia,
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
 
-                Text(dia, modifier = Modifier.weight(1f))
+                    Box {
+                        Button(onClick = { expanded = true }) {
+                            Text(receta?.name ?: "Asignar")
+                        }
 
-                Box {
-
-                    Button(onClick = {
-                        expanded = true
-                    }) {
-                        Text(receta?.name ?: "Asignar")
-                    }
-
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-
-                        viewModel.recetas.forEach { rec ->
-
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
                             DropdownMenuItem(
-                                text = { Text(rec.name) },
+                                text = { Text("— Sin receta —") },
                                 onClick = {
-                                    viewModel.asignarReceta(dia, rec)
+                                    viewModel.asignarReceta(dia, null)
                                     expanded = false
                                 }
                             )
+
+                            if (viewModel.recetas.isEmpty()) {
+                                DropdownMenuItem(
+                                    text = { Text("No hay recetas creadas") },
+                                    onClick = { expanded = false },
+                                    enabled = false
+                                )
+                            } else {
+                                viewModel.recetas.forEach { rec ->
+                                    DropdownMenuItem(
+                                        text = { Text(rec.name) },
+                                        onClick = {
+                                            viewModel.asignarReceta(dia, rec)
+                                            expanded = false
+                                        }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
-
-            //Spacer(modifier = Modifier.height(5.dp))
         }
     }
 }
