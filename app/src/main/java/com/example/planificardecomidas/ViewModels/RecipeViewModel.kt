@@ -7,11 +7,11 @@ import com.example.planificardecomidas.models.*
 
 class RecipeViewModel : ViewModel() {
 
-    var recetas = mutableStateListOf<Recipe>()
-        private set
+    var recetas = mutableStateListOf<Recipe>()//crea una lista observable para almacenar las recetas
+    private set
 
     var planSemanal = mutableStateMapOf(
-     "Lunes" to null as Recipe?,
+        "Lunes" to null as Recipe?,
         "Martes" to null,
         "Miércoles" to null,
         "Jueves"    to null,
@@ -37,22 +37,22 @@ class RecipeViewModel : ViewModel() {
 
     fun getShoppingList(): List<Ingredient> {
 
-        val cantidades = mutableMapOf<String, Int>()
+        val cantidades = mutableMapOf<String, Int>()//crea cantidad = {clave, valor}
         val unidades = mutableMapOf<String, String>()
 
-        planSemanal.values.filterNotNull()
-            .forEach { receta ->
-                receta.ingredients.forEach { ingrediente ->
+        planSemanal.values.filterNotNull()// elimina los null
+            .forEach { receta ->// itera cada receta para obtebner los ingredientes
+                receta.ingredients.forEach { ingrediente ->//recorre cada ingrediente de la receta
                     val nombre = ingrediente.name
-                    val numero = ingrediente.quantity.filter { it.isDigit() }.toIntOrNull() ?: 0
-                    val unidad = ingrediente.quantity.filter { !it.isDigit() }.trim()
+                    val numero = ingrediente.quantity.filter { it.isDigit() }.toIntOrNull() ?: 0//toma solo el numero y convierte a INT
+                    val unidad = ingrediente.quantity.filter { !it.isDigit() }.trim()// toma lo que no es numero y elimina los espacios
 
-                    cantidades[nombre] = (cantidades[nombre] ?: 0) + numero
+                    cantidades[nombre] = (cantidades[nombre] ?: 0) + numero// aqui usa si 0 si es que el nombre aparece la primera vez despues si aparece otra ves toma el valor de la ultima cantidad
                     unidades[nombre] = unidad
                 }
             }
 
-        return cantidades.map { (nombre, cantidad) ->
+        return cantidades.map { (nombre, cantidad) ->//convierte los mapas en lista de ingredientes
             Ingredient(
                 name = nombre,
                 quantity = "$cantidad ${unidades[nombre]}".trim()
