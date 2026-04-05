@@ -12,6 +12,9 @@ import com.example.planificardecomidas.ViewModels.RecipeViewModel
 @Composable
 fun WeeklyPlanScreen(viewModel: RecipeViewModel) {
 
+    //Lista fija de días en el orden correcto
+    val daysInOrder = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -25,8 +28,10 @@ fun WeeklyPlanScreen(viewModel: RecipeViewModel) {
                 .padding(bottom = 12.dp)
         )
 
-        viewModel.planSemanal.forEach { (dia, receta) ->
+        // Itera sobre la lista ordenada, no sobre el mapa directamente
+        daysInOrder.forEach { dia ->
 
+            val receta = viewModel.planSemanal[dia]
             var expanded by remember { mutableStateOf(false) }
 
             Card(

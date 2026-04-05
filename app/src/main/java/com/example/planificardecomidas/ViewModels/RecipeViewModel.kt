@@ -8,10 +8,10 @@ import com.example.planificardecomidas.models.*
 class RecipeViewModel : ViewModel() {
 
     var recetas = mutableStateListOf<Recipe>()
-        private set
+    private set
 
     var planSemanal = mutableStateMapOf(
-     "Lunes" to null as Recipe?,
+        "Lunes" to null as Recipe?,
         "Martes" to null,
         "Miércoles" to null,
         "Jueves"    to null,
