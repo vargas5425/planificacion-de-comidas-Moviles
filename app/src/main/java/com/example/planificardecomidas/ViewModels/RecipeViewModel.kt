@@ -14,10 +14,10 @@ class RecipeViewModel : ViewModel() {
      "Lunes" to null as Recipe?,
         "Martes" to null,
         "Miércoles" to null,
-        "Jueves" to null,
-        "Viernes" to null,
-        "Sábado" to null,
-        "Domingo" to null
+        "Jueves"    to null,
+        "Viernes"   to null,
+        "Sábado"    to null,
+        "Domingo"   to null
     )
         private set
 
