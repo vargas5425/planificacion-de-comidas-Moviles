@@ -1,15 +1,17 @@
 package com.example.planificardecomidas.ViewModels
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import com.example.planificardecomidas.models.*
 
 class RecipeViewModel : ViewModel() {
 
-    var recetas = mutableStateListOf<Recipe>()
+    var recetas = mutableStateListOf<Recipe>()//crea una lista observable para almacenar las recetas
+        private set
 
-    var planSemanal = mutableMapOf(
-        "Lunes" to null as Recipe?,
+    var planSemanal = mutableStateMapOf(
+     "Lunes" to null as Recipe?,
         "Martes" to null,
         "Miércoles" to null,
         "Jueves" to null,
@@ -17,48 +19,44 @@ class RecipeViewModel : ViewModel() {
         "Sábado" to null,
         "Domingo" to null
     )
+        private set
+
+    val checkedIngredients = mutableStateMapOf<String, Boolean>()
 
     fun addReceta(recipe: Recipe) {
         recetas.add(recipe)
     }
 
-    fun asignarReceta(day: String, receta: Recipe) {
+    fun asignarReceta(day: String, receta: Recipe?) {
         planSemanal[day] = receta
+    }
+
+    fun toggleIngredient(name: String) {
+        checkedIngredients[name] = !(checkedIngredients[name] ?: false)
     }
 
     fun getShoppingList(): List<Ingredient> {
 
-        val result = mutableMapOf<String, Ingredient>()
-        planSemanal.values.filterNotNull().forEach { recipe ->
+        val cantidades = mutableMapOf<String, Int>()//crea cantidad = {clave, valor}
+        val unidades = mutableMapOf<String, String>()
 
-            recipe.ingredients.forEach { ing ->
+        planSemanal.values.filterNotNull()// elimina los null
+            .forEach { receta ->// itera cada receta para obtebner los ingredientes
+                receta.ingredients.forEach { ingrediente ->//recorre cada ingrediente de la receta
+                    val nombre = ingrediente.name
+                    val numero = ingrediente.quantity.filter { it.isDigit() }.toIntOrNull() ?: 0//toma solo el numero y convierte a INT
+                    val unidad = ingrediente.quantity.filter { !it.isDigit() }.trim()// toma lo que no es numero y elimina los espacios
 
-                val existing = result[ing.name]
-
-                if (existing != null) {
-
-                    // sumar cantidades (solo números)
-                    val cantidadActual = existing.quantity.filter { it.isDigit() }.toIntOrNull() ?: 0
-                    val nuevaCantidad = ing.quantity.filter { it.isDigit() }.toIntOrNull() ?: 0
-
-                    val unit = existing.quantity.filter { !it.isDigit() }
-
-                    val total = cantidadActual + nuevaCantidad
-
-                    result[ing.name] = Ingredient(
-                        name = ing.name,
-                        quantity = "$total $unit".trim()
-                    )
-
-                } else {
-                    result[ing.name] = Ingredient(
-                        name = ing.name,
-                        quantity = ing.quantity
-                    )
+                    cantidades[nombre] = (cantidades[nombre] ?: 0) + numero// aqui usa si 0 si es que el nombre aparece la primera vez despues si aparece otra ves toma el valor de la ultima cantidad
+                    unidades[nombre] = unidad
                 }
             }
-        }
 
-        return result.values.toList()
+        return cantidades.map { (nombre, cantidad) ->//convierte los mapas en lista de ingredientes
+            Ingredient(
+                name = nombre,
+                quantity = "$cantidad ${unidades[nombre]}".trim()
+            )
+        }
     }
 }
