@@ -12,7 +12,8 @@ import com.example.planificardecomidas.models.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.ui.text.style.TextAlign
-import kotlinx.coroutines.launch
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
 private fun validateRecipe(recipeName: String, ingredients: List<Ingredient>): String? {
     return when {
@@ -22,6 +23,7 @@ private fun validateRecipe(recipeName: String, ingredients: List<Ingredient>): S
         else -> null
     }
 }
+
 @Composable
 fun AddRecipeScreen(viewModel: RecipeViewModel,
                     onRecipeSave: () -> Unit) {
@@ -29,12 +31,10 @@ fun AddRecipeScreen(viewModel: RecipeViewModel,
     var recipeName by remember { mutableStateOf("") }
     val ingredients = remember { mutableStateListOf<Ingredient>() }
 
-    // Snackbar
-    val mesjEmergente = remember { SnackbarHostState() }
-    val errorMessage = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Scaffold(
-        snackbarHost = { SnackbarHost(mesjEmergente) }
+
     ) { innerPadding ->
 
         Text(
@@ -130,9 +130,7 @@ fun AddRecipeScreen(viewModel: RecipeViewModel,
                             ingredients.clear()
                             onRecipeSave()
                         } else {
-                            errorMessage.launch {
-                                mesjEmergente.showSnackbar(message)
-                            }
+                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier.padding(10.dp)
